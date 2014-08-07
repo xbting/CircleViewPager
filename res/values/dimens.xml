@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="default_lock_prvview_radius">4dp</dimen>
-    <dimen name="default_lock_preview_stroke_width">1.5dp</dimen>
-    <dimen name="default_lock_preview_circle_padding">5dp</dimen>
+    <dimen name="default_circle_indicator_radius">4dp</dimen>
+    <dimen name="default_circle_indicator_stroke_width">1.5dp</dimen>
+    <dimen name="default_circle_indicator_circle_padding">5dp</dimen>
 </resources>

@@ -19,12 +19,20 @@
         <attr name="circleGreen" format="reference" />
         <attr name="circleRed" format="reference" />
     </declare-styleable>
-    <declare-styleable name="LockPatternPreView">
-        <attr name="radius" format="dimension" />
-        <attr name="cellPadding" format="dimension" />
-        <attr name="fillColor" format="color" />
-        <attr name="strokeColor" format="color" />
-        <attr name="strokeWidth" format="dimension" />
+    
+       <declare-styleable name="CircleViewPager">
+        <attr name="radius" />
+        <attr name="pageColor" />
+        <attr name="fillColor" />
+        <attr name="strokeColor" />
+        <attr name="strokeWidth" />
+        <attr name="circlePadding" format="dimension" />
     </declare-styleable>
+
+    <attr name="radius" format="dimension" />
+    <attr name="pageColor" format="color" />
+    <attr name="fillColor" format="color" />
+    <attr name="strokeColor" format="color" />
+    <attr name="strokeWidth" format="dimension" />
 
 </resources>

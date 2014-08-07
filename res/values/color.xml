@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="default_lock_preview_view_fill_color">#0033ff</color>
-    <color name="default_lock_preview_view_stroke_color">#777777</color>
+    <color name="default_circle_indicator_page_color">#ffffff</color>
+    <color name="default_circle_indecator_stroke_color">#777777</color>
+    <color name="default_circle_indicator_fill_color">#0033ff</color>
 </resources>

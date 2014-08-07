@@ -2,7 +2,6 @@
 package com.xbting.circle.vp.widget;
 
 
-
 import com.xbting.circle.vp.R;
 
 import android.content.Context;
@@ -11,14 +10,13 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.view.View;
 
-/**
- * author xbting
- * 
- */
+
 public class CircleIndicator extends View implements OnPageChangeListener{
 	
 	private CircleViewPager mCircleViewPager;
@@ -26,13 +24,16 @@ public class CircleIndicator extends View implements OnPageChangeListener{
 	private float radius ;
 	/**圆圈间距*/
 	private float circlePadding;
-	/**圆点的填充颜色*/
-	private int fillColor;
+	/**未选中页面圆点填充颜色*/
+	private int pageColor;
 	/**空心圆点的环颜色*/
 	private int strokeColor;
 	/**空心圆点的环宽度*/
 	private float strokeWidth;
+	/**选中页面圆点填充颜色*/
+	private int fillColor;
 
+	private final Paint mPaintPage = new Paint();
 	private final Paint mPaintStroke = new Paint();
 	private final Paint mPaintFill = new Paint();
 	private int count;
@@ -44,11 +45,13 @@ public class CircleIndicator extends View implements OnPageChangeListener{
 	public CircleIndicator(Context context) {
 		super(context);
 		Resources res = getResources();
-		radius  = res.getDimension(R.dimen.default_lock_prvview_radius);
-		circlePadding = res.getDimension(R.dimen.default_lock_preview_circle_padding);
-		strokeWidth= res.getDimension(R.dimen.default_lock_preview_stroke_width);
-		fillColor = res.getColor(R.color.default_lock_preview_view_fill_color);
-		strokeWidth = res.getColor(R.color.default_lock_preview_view_stroke_color);
+		radius  = res.getDimension(R.dimen.default_circle_indicator_radius);
+		circlePadding = res.getDimension(R.dimen.default_circle_indicator_circle_padding);
+		pageColor = res.getColor(R.color.default_circle_indicator_page_color);
+		strokeWidth= res.getDimension(R.dimen.default_circle_indicator_stroke_width);
+		strokeColor = res.getColor(R.color.default_circle_indecator_stroke_color);
+		fillColor = res.getColor(R.color.default_circle_indicator_fill_color);
+
 		init();
 	}
 
@@ -73,18 +76,20 @@ public class CircleIndicator extends View implements OnPageChangeListener{
 	 */
 	private void getAttrs(Context context, AttributeSet attrs){
 		Resources res = getResources();
-		float defaultRadius  = res.getDimension(R.dimen.default_lock_prvview_radius);
-		float defaultCirclePadding = res.getDimension(R.dimen.default_lock_preview_circle_padding);
-		float defaultStrokeWidth= res.getDimension(R.dimen.default_lock_preview_stroke_width);
-		int defaultFillColor = res.getColor(R.color.default_lock_preview_view_fill_color);
-		int defaultStrokeColor = res.getColor(R.color.default_lock_preview_view_stroke_color);
+		float defaultRadius  = res.getDimension(R.dimen.default_circle_indicator_radius);
+		float defaultCirclePadding = res.getDimension(R.dimen.default_circle_indicator_circle_padding);
+		int defaultPageColor = res.getColor(R.color.default_circle_indicator_page_color);
+		float defaultStrokeWidth= res.getDimension(R.dimen.default_circle_indicator_stroke_width);
+		int defaultFillColor = res.getColor(R.color.default_circle_indicator_fill_color);
+		int defaultStrokeColor = res.getColor(R.color.default_circle_indecator_stroke_color);
 		
-		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.LockPatternPreView);
-		radius = ta.getDimension(R.styleable.LockPatternPreView_radius, defaultRadius);
-		circlePadding = ta.getDimension(R.styleable.LockPatternPreView_cellPadding, defaultCirclePadding);
-		strokeWidth = ta.getDimension(R.styleable.LockPatternPreView_strokeWidth, defaultStrokeWidth);
-		fillColor = ta.getColor(R.styleable.LockPatternPreView_fillColor, defaultFillColor);
-		strokeColor = ta.getColor(R.styleable.LockPatternPreView_strokeColor, defaultStrokeColor);
+		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CircleViewPager);
+		radius = ta.getDimension(R.styleable.CircleViewPager_radius, defaultRadius);
+		circlePadding = ta.getDimension(R.styleable.CircleViewPager_circlePadding, defaultCirclePadding);
+		strokeWidth = ta.getDimension(R.styleable.CircleViewPager_strokeWidth, defaultStrokeWidth);
+		fillColor = ta.getColor(R.styleable.CircleViewPager_fillColor, defaultFillColor);
+		strokeColor = ta.getColor(R.styleable.CircleViewPager_strokeColor, defaultStrokeColor);
+		pageColor = ta.getColor(R.styleable.CircleViewPager_pageColor, defaultPageColor); 
 		ta.recycle();
 	}
 
@@ -106,18 +111,22 @@ public class CircleIndicator extends View implements OnPageChangeListener{
 		if(this.mCircleViewPager!=null){
 			this.mCircleViewPager.setOnPageChangeListener(this);
 		}
+	    requestLayout();
 	}
 
 	/**
 	 * 初始化
 	 * 
 	 * void
+	 * 
 	 */
 	private void init() {
 		mPaintStroke.setStyle(Style.STROKE);
 		mPaintStroke.setColor(strokeColor);
 		mPaintStroke.setStrokeWidth(strokeWidth);
 		
+		mPaintFill.setStyle(Style.FILL);
+		mPaintPage .setColor(pageColor);
 		mPaintFill.setStyle(Style.FILL);
 		mPaintFill.setColor(fillColor);
 	}
@@ -159,9 +168,15 @@ public class CircleIndicator extends View implements OnPageChangeListener{
 		
 		//draw stroked circles
 		for (int i = 0; i < count; i++) {
-			float dx = firstX+circlePadding*i+radius*2*i;
+			float dx = firstX + circlePadding * i + radius * 2 * i;
 			float dy = firstY;
-			canvas.drawCircle(dx, dy, radius, mPaintStroke);//画空心圈
+			if(mPaintStroke.getStrokeWidth()>0){
+				canvas.drawCircle(dx, dy, radius, mPaintStroke);// 画空心圈
+			}
+
+			if (mPaintPage.getAlpha() > 0) {
+				canvas.drawCircle(dx, dy, radius, mPaintPage);
+			}
 		}
 		
 		//Draw the filled circle 
@@ -185,7 +200,73 @@ public class CircleIndicator extends View implements OnPageChangeListener{
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 		
 	}
-
+	
+//	@Override
+//	protected void onRestoreInstanceState(Parcelable state) {
+//		// TODO Auto-generated method stub
+//		SavedState savedState = (SavedState) state;
+//		super.onRestoreInstanceState(savedState.getSuperState());
+//		realCurrentItem = savedState.currentPage;
+//		count = savedState.totalPage;
+//		SWLog.LogE("CircleIndicator----onRestoreInstanceState"+"   realCurrentItem:"+realCurrentItem+"    count:"+count);
+//		requestLayout();
+//
+//	}
+//	
+//	@Override
+//	protected Parcelable onSaveInstanceState() {
+//		// TODO Auto-generated method stub
+//		SWLog.LogI("CircleIndicator----onSaveInstanceState   totalPage:"+count+"   currentPage:"+realCurrentItem);
+//		SavedState savedState = new SavedState(super.onSaveInstanceState());
+//		savedState.totalPage = count;
+//		savedState.currentPage = realCurrentItem;
+//		return savedState;
+//	}
+	
+//	public static class SavedState extends BaseSavedState {
+//		int totalPage;
+//		int currentPage;
+//
+//		/**
+//		 * @param arg0
+//		 */
+//		public SavedState(Parcelable arg0) {
+//			super(arg0);
+//			// TODO Auto-generated constructor stub
+//		}
+//
+//		/**
+//		 * @param arg0
+//		 */
+//		public SavedState(Parcel in) {
+//			super(in);
+//			// TODO Auto-generated constructor stub
+//			totalPage = in.readInt();
+//			currentPage = in.readInt();
+//		}
+//
+//		@Override
+//		public void writeToParcel(Parcel dest, int flags) {
+//			// TODO Auto-generated method stub
+//			super.writeToParcel(dest, flags);
+//			dest.writeInt(totalPage);
+//			dest.writeInt(currentPage);
+//		}
+//
+//
+//		public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+//			@Override
+//			public SavedState createFromParcel(Parcel in) {
+//				return new SavedState(in);
+//			}
+//
+//			@Override
+//			public SavedState[] newArray(int size) {
+//				return new SavedState[size];
+//			}
+//		};
+//
+//	}
 
 
 	@Override
