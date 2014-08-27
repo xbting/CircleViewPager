@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * author xbting
+ * @author xbting
  * 
  */
 public class SimpleCirclePageAdapter extends CirclePagerAdapter{

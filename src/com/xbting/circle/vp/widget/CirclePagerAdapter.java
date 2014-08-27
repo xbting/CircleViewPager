@@ -5,7 +5,7 @@ import android.view.View;
 
 /**
  *
- * author xbting
+ * @author xbting
  *
  */
 public class CirclePagerAdapter extends PagerAdapter{

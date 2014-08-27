@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 /**
- * author xbting
+ * @author xbting
  * 
  */
 @SuppressLint("HandlerLeak")
