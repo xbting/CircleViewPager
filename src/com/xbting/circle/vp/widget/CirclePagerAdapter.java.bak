@@ -13,12 +13,7 @@ public class CirclePagerAdapter extends PagerAdapter{
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		if(getRealCount()>1){
-				return Integer.MAX_VALUE;
-		}else{
-			 getRealCount()
-		}
-	
+		return Integer.MAX_VALUE;
 	}
 	
 	/**
