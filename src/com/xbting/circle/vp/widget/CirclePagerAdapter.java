@@ -16,7 +16,7 @@ public class CirclePagerAdapter extends PagerAdapter{
 		if(getRealCount()>1){
 				return Integer.MAX_VALUE;
 		}else{
-			 getRealCount()
+			 return getRealCount();
 		}
 	
 	}
